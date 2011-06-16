@@ -1,0 +1,1315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><head><title></title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="GENERATOR" content="hevea 1.06">
+</head>
+<body>
+<!--HEVEA command line is: hevea -fix spec-hevea.tex spec -->
+<!--HTMLHEAD-->
+<!--ENDHTML-->
+<!--PREFIX <ARG ></ARG>-->
+<!--CUT DEF section 1 -->
+<br>
+<br>
+
+
+<br>
+<br>
+
+<br>
+<br>
+
+
+
+
+<h1 align="center">Cops &amp; Robbers<br>
+The ICFP 2005 Programming Contest Task</h1>
+
+<h3 align="center">The ICFP 2005 Programming Contest Committee</h3>
+
+<h3 align="center">Version 7</h3>
+<!--TOC section Introduction-->
+
+<h2><a name="htoc1">1</a>&nbsp;&nbsp;Introduction</h2><!--SEC END -->
+
+In the far-flung future of the year 2000, functional programming has
+taken over the world and so humans live in an almost unimaginable
+luxury. Since it's so easy, humans have used robots to automate
+everything, even law enforcement and bank robbery --- the only job
+left to humans is to write their robots' control programs. In this
+year's task, you will play two roles in the world of 2000 by writing
+the control program that guides a Robber-Bot through a quiet urban
+neighborhood on a mission to rob every bank without getting caught,
+and the control program for a Cop-Bot dedicated to stopping it. Your
+Robber-Bot has the benefit of stealth; your Cop-Bot will work on a
+team with four other contestants' entries and have the power of
+numbers and coordination (not to mention an awesome late-model Police
+Robo-Cruiser).<br>
+<br>
+The game takes place in a virtual Hyde Park, Chicago, in the year
+2000. As the game begins, the Cop-Bots have just received word that a
+Robber-Bot was just spotted at a park on 54th and Ridgewood and are
+headed out in pursuit, either on foot for better awareness of their
+surroundings or in their Robo-Cruisers built for speed. They cannot
+see the Robber-Bot, but they may be able to infer its whereabouts:
+whenever it robs a bank they know about it, it occasionally
+leaves behind evidence that cops can use to pinpoint its past
+locations, and the Robber-Bot has a certain odor that Cop-Bots can sense when they are nearby.<br>
+<br>
+Furthermore, though each Cop-Bot will be a
+different program from a different contestant with the ability to act
+independently, on every turn Cop-Bots can coordinate strategies with
+each other and share any knowledge they may have found. Their goal is
+to coordinate with each other to apprehend the robber with as little
+money stolen as possible.<br>
+<br>
+Meanwhile the Robber-Bot --- who knows the locations of all the
+Cop-Bots at all times --- is trying to keep from getting caught while
+stealing as much money from Hyde Park's six banks as possible. It
+cannot outrun the cops, since it moves at the same pace as a cop on
+foot and can usually be overtaken by a Robo-Cruiser, but it can use
+uncertainty about its location to its advantage.<br>
+<br>
+Your programming task is to write a program for a Robber-Bot and a
+program for a Cop-Bot that will work on teams with other contestants'
+Cop-Bots. You will have to make some hard decisions: as a Cop-Bot you
+need to work with others to catch the robber, but you need to get
+ahead of them to stand out. As the Robber-Bot you need to give away
+as little about your position as you can while at the same time
+robbing as many banks as you can, all the while keeping one step ahead
+of the Cop-Bots.<br>
+<br>
+Your Cop-Bot will earn points for how quickly the Cop-Bot team as a
+group catches the Robber-Bot and individually for how much evidence it
+collects, how persuasive a leader it is, and whether it is the one
+that actually steps in and nabs the bad guy. Your Robber-Bot will
+earn points for how much money it can steal from banks without getting
+caught.<br>
+<br>
+But that's not all: the most important part of the contest is that your
+programs will have to be written so they can easily adapt to changing
+requirements. After you've turned in your programs and have had a
+chance to rest and recuperate, we will announce a set of rule changes.
+Once we do, you'll have just 24 hours to modify your program to
+reflect them. We will run two tournaments, one for your original
+programs and one for the modified ones. As you might expect, your
+final ranking will depend more on the modified than the unmodified
+versions. The changes we make to the rules might be minor or major,
+but your code's flexibility will be the difference between a program
+that can barely follow the rules and a program that wins the contest.<br>
+<br>
+The rest of this document explains the first phase of the competition
+in more detail. In the next section we explain the rules of the game
+and the scoring system we will use to determine the winners. In section&nbsp;<a href="#protocol">3</a> we explain the protocol that your programs will
+use to communicate with the game manager. In
+section&nbsp;<a href="#tournament">4</a>, we explain the tournament structure.<br>
+<br>
+The submission format is specified at the submission page, linked from
+the ICFP contest home page. Please see the submission instructions there.<br>
+<div align="center"><a href="http://icfpc.plt-scheme.org/"><tt>http://icfpc.plt-scheme.org/</tt></a></div><br>
+
+<!--TOC section Rules-->
+
+<h2><a name="htoc2">2</a>&nbsp;&nbsp;Rules</h2><!--SEC END -->
+
+Cops &amp; Robbers is a turn-based game where cops and robbers alternate
+moving from intersection to intersection on a map of Hyde Park. Each 
+game has five Cop-Bots and one Robber-Bot, and each robot is
+controlled by a different contestant's program (the tournament consists 
+of multiple games, see section&nbsp;<a href="#tournament">4</a> for details). <br>
+<br>
+As the game progresses and the robbers and cops interact, they see 
+snapshots of the state of the game, called worlds. Time in the game is 
+marked by numbering those worlds. The robbers see the even numbered 
+worlds and the cops see the odd-numbered worlds. <br>
+<br>
+When the Robber-Bot is informed of the state of the world, it receives 
+full information about the location of the cops, in addition to the 
+amount of money currently in the banks. It inspects the world and 
+decides where to move. If it moves onto a bank it automatically steals 
+all the money that the bank contains. It also sometimes leaves behind 
+evidence of its whereabouts as it leaves a location.<br>
+<br>
+When the Cop-Bots are informed of the state of the world, they learn how
+ far away the robber is (if it is nearby), every other Cop-Bot's 
+location and mode of
+transportation, which bank the Robber-Bot is robbing (if any), and the 
+money left in the banks. They can then share information with each 
+other. Afterwards, they each propose a plan that indicates where all of 
+the Cop-Bots should move, vote on all the plans, and then individually 
+move. The voting is non-binding, but helps the Cop-Bots coordinate.<br>
+<br>
+Cop-Bots can move either on foot or in a Robo-Cruiser: foot cops can
+smell the robber up to two squares away, and can move one intersection 
+away without regard for whether a street is one-way or two way. Cop-Bots
+ in
+Robo-Cruisers can travel one intersection along extra-long 
+Robo-Cruiser-only roads or normal roads, but can only smell the robber 
+if it is one square away, and must obey one-way streets.<br>
+<br>
+The game is over when the Cop-Bots catch the Robber-Bot or when the 
+Robber-Bot has evaded the Cop-Bots for 201 worlds (numbered 0 thru 200).
+ At the end of the game, the Robber-Bot is rewarded for how much money 
+it managed to get without being caught and the Cop-Bots are rewarded as a
+ team for how quickly they caught the Robber-Bot and individually for 
+gathering the most evidence, having the most-selected plans, and being 
+the actual Cop-Bot to catch the robber.<br>
+<br>
+The rest of this section explains these rules in more detail.
+Section&nbsp;<a href="#rules:map">2.1</a> explains the game map,
+section&nbsp;<a href="#rules:players">2.2</a> explains the rules that pertain to
+Cop-Bots and Robber-Bots, section&nbsp;<a href="#rules:turns">2.3</a> explains the turn
+structure, and section&nbsp;<a href="#rules:scoring">2.4</a> explains the scoring rules.<br>
+<br>
+<!--TOC subsection The Game Map-->
+
+<h3><a name="htoc3">2.1</a>&nbsp;&nbsp;The Game Map</h3><!--SEC END -->
+
+<a name="rules:map"></a>
+A <i>game map</i> is a directed graph with labelled nodes and two
+distinguished kinds of edges. In the Cops &amp; Robbers game, the game
+map is fixed and is a representation of the Hyde Park neighborhood of
+Chicago. Vertices are labelled and are called <i>intersections</i>;
+edges are called <i>streets</i>. All gameplay takes place on this
+map: each Cop-Bot and Robber-Bot is positioned on an intersection, all
+banks are located on intersections, robots can only travel along
+streets, and so forth.<br>
+<br>
+<!--TOC paragraph Intersections-->
+
+<h5>Intersections</h5><!--SEC END -->
+
+Each intersection in the map has a unique name. An intersection may
+be occupied by more than one player. Players move between
+intersections along streets. There are two kinds of distinguished
+intersections: banks and police headquarters, whose roles are
+explained in subsequent sections.<br>
+<br>
+<!--TOC paragraph Streets-->
+
+<h5>Streets</h5><!--SEC END -->
+
+Streets go from one intersection to another, and are considered to be
+one way (two-way streets are represented by a pair of one-way streets
+going opposite directions). <br>
+<br>
+There are two kinds of streets: those that any Cop-Bot may travel along 
+and those that can only be taken by a Cop-Bot in a Robo-Cruiser. The 
+directionality of a street is only important to car cops; Cop-Bots on 
+foot can always travel in either direction on a street (if they can 
+travel on the street at all). For more information about how robots 
+travel along streets see section&nbsp;<a href="#rules:players">2.2</a>.<br>
+<br>
+<!--TOC paragraph Banks-->
+
+<h5>Banks</h5><!--SEC END -->
+
+<a name="rules:banks"></a>
+There are six banks on the game map. Each bank occupies a unique
+intersection. Each bank has a certain amount of cash in its vault
+that is announced to all players every turn. When a Robber-Bot moves
+into an intersection occupied by a bank, he or she automatically robs
+the bank, steals the entire contents of the vault, and triggers an
+alarm that informs all cops of the robber's exact location.<br>
+<br>
+Each bank starts the game with 1000 dollars in its vault. A robbed bank
+will receive additional funds after several turns of play according to
+the following rules: if the robber moves onto a bank between world <i>n</i> and world <i>n</i>+1, then between worlds <i>n</i>+8 and <i>n</i>+9 the bank receives funds from
+the other banks. The fund transfer is instantaneous. The robber sees world <i>n</i>+8 with uneven amounts in the bank and the cops see world <i>n</i>+9
+ with the funds transferred. Each bank contributes 1/6 of the difference
+ between the contents of its vault and the contents of the robbed bank's
+ value to the robbed bank, at the time the transfer occurs. This 
+transfer occurs even if the bank had no money in it when it was robbed. 
+If the robber is robbing a bank when the transfer occurs, the robber 
+robs the bank <i>before</i> the transfer.<br>
+<br>
+<!--TOC paragraph Police Headquarters-->
+
+<h5>Police Headquarters</h5><!--SEC END -->
+
+Hyde Park has a local police headquarters located at one of the
+intersections in the game map. All Cop-Bots start the game at police
+headquarters. Whenever a cop is located at headquarters, it may choose
+to pick up a Police Robo-Cruiser from the parking lot or to exit its
+Robo-Cruiser and leave on foot. In tournament play, the headquarters
+will always be at the intersection labelled <tt>55-and-woodlawn</tt>.<br>
+<br>
+<!--TOC paragraph Evidence-->
+
+<h5>Evidence</h5><!--SEC END -->
+
+<a name="rules:evidence"></a>
+An intersection may have one or more pieces of <i>evidence</i> on
+it. Evidence is represented in the game by a single number on an 
+intersection. The number indicates which world the Robber-Bot occupied 
+the intersection.<br>
+<br>
+During game play, the intersection the Robber-Bot occupies in world 8, 
+and any subsequent world whose number is divisible by 8, is marked with 
+evidence. In other words, if the Robber-Bot is on intersection <i>i</i> in world <i>n</i>, <i>n</i> % 8 = 0 and <i>n</i> &gt;= 8, then <i>n</i> becomes a piece of evidence on intersection <i>i</i>.<br>
+<br>
+When a Cop-Bot moves into an intersection that contains one or more
+pieces of evidence, the Cop-Bot is given all the evidence on that
+intersection and all evidence is removed from that intersection.
+If more than one cop occupies an intersection in the same world and
+there is evidence on that intersection, each cop present is given a copy
+of the evidence.<br>
+<br>
+All evidence that was placed on world <i>n</i> is removed on world <i>n</i>+24 (if it had not already been collected by a Cop-Bot).<br>
+<br>
+<!--TOC paragraph Smells-->
+
+<h5>Smells</h5><!--SEC END -->
+
+If a Cop-Bot in a Robo-Cruiser is within one intersection of the 
+Robber-Bot (according to a legal move with the cop's current mode of 
+transportation; see section&nbsp;<a href="#rules:players">2.2</a> for a 
+description of the legal moves) it is informed that it can smell the 
+Robber-Bot. Similarly, if a Cop-Bot on foot is within two intersections 
+of the Robber-Bot (according to its legal moves), it is informed that it
+ can smell the robber, and it is informed of the distance to the robber.
+ <br>
+<br>
+The smells do not take into account the fact that the Cop-Bot might 
+change its mode of transportation. For example, if a Cop-Bot is at the 
+police headquarters in a Robo-Cruiser, and the Robber-Bot is two 
+intersections away, the Cop-Bot does not smell the Robber-Bot.<br>
+<br>
+The smells do take into account car-only edges, however. For example, a Cop-Bot in a Robo-Cruiser at <tt>55-and-south-hyde-park</tt> can smell both
+<tt>55-and-cottage-grove</tt> and <tt>55-and-cornell</tt> (and the other intersections it could move to).<br>
+<br>
+
+<!--TOC subsection The Robots-->
+
+<h3><a name="htoc4">2.2</a>&nbsp;&nbsp;The Robots</h3><!--SEC END -->
+
+<a name="rules:players"></a>
+There are two kinds of robots in the game: Cop-Bots and Robber-Bots.
+In each game there are exactly five Cop-Bots and exactly one
+Robber-Bot. Each robot is controlled by a different player.<br>
+<br>
+<!--TOC subsubsection Cops-->
+
+<h4><a name="htoc5">2.2.1</a>&nbsp;&nbsp;Cops</h4><!--SEC END -->
+
+Cop-Bots earn points by locating and capturing the Robber-Bot. The
+Robber-Bot is captured when one or more Cop-Bots occupies the same
+intersection as the Robber-Bot.<br>
+<br>
+<!--TOC paragraph Cop-Bot starting position-->
+
+<h5>Cop-Bot starting position</h5><!--SEC END -->
+
+All Cop-Bots begin the game at the police headquarters. In tournament
+play this is always the intersection labelled <tt>55-and-woodlawn</tt>.<br>
+<br>
+<!--TOC paragraph Cop visibility-->
+
+<h5>Cop visibility</h5><!--SEC END -->
+
+All cops can see the locations and transportation of all the other
+cops in the game.<br>
+<br>
+Cop-Bots are informed of the Robber-Bot's location when the Robber-Bot
+is occupying an intersection that contains a bank.<br>
+<br>
+<!--TOC paragraph Cop communication-->
+
+<h5>Cop communication</h5><!--SEC END -->
+
+Cop-Bots can communicate with each other during designated
+communication rounds before they decide on moves. Communication
+consists of three rounds: the announcement round, the planning round,
+and the voting round. These rounds are explained in game terms in
+section&nbsp;<a href="#rules:cop-turns">2.3.2</a> and the exact protocol format is given
+in section&nbsp;<a href="#protocol">3</a>. Informally, in these rounds the Cop-Bots
+share knowledge, propose plans of action, and then vote to decide
+which plan to collectively follow.<br>
+<br>
+While cops do select a plan collectively, that plan is
+<i>non-binding</i>. Cops may make any (legal) move they want
+regardless of the plan's instructions for them.<br>
+<br>
+<!--TOC paragraph Cop movement-->
+
+<h5>Cop movement</h5><!--SEC END -->
+
+Cops on foot may move one intersection per turn along any street that
+allows pedestrian access, and in either direction. Cops in cars may
+move one intersection per turn along any car street or pedestrian
+access street, but must observe the direction of one way streets. See section&nbsp;<a href="#rules:map">2.1</a> for more details of the street structure.<br>
+<br>
+<!--TOC subsubsection Robbers-->
+
+<h4><a name="htoc6">2.2.2</a>&nbsp;&nbsp;Robbers</h4><!--SEC END -->
+
+The Robber-Bot wins points by robbing banks while avoiding capture by
+Cop-Bots.<br>
+<br>
+<!--TOC paragraph Robber starting position-->
+
+<h5>Robber starting position</h5><!--SEC END -->
+
+The robber begins the game at a particular, specially labelled
+intersection on the map. In tournament play that intersection will
+always be the intersection labelled <tt>54-and-ridgewood</tt>.<br>
+<br>
+<!--TOC paragraph Robber visibility-->
+
+<h5>Robber visibility</h5><!--SEC END -->
+
+The robber has a police scanner and knows the exact location and mode
+of transportation of all cops on the map. The robber leaves evidence
+on certain intersections as described in section&nbsp;<a href="#rules:evidence">2.1</a>
+and cannot cover its tracks.<br>
+<br>
+<!--TOC paragraph Robber movement-->
+
+<h5>Robber movement</h5><!--SEC END -->
+
+<a name="rules:robber-movement"></a>
+The robber moves on foot following the same movement rules as the
+Cop-Bots on foot.<br>
+<br>
+
+<!--TOC subsection Turn Structure-->
+
+<h3><a name="htoc7">2.3</a>&nbsp;&nbsp;Turn Structure</h3><!--SEC END -->
+
+<a name="rules:turns"></a>
+Game play is broken into a series of turns. Conceptually, turns occur between worlds (and are what generate new worlds).<br>
+<br>
+In the following discussion it will be useful to refer to the current
+world. We will use the variable <i>n</i> for that purpose. Also, we will
+refer to robots ``announcing'' information. These announcements are
+made to the game manager, and are not shared with any other robot.
+Points at which robots are informed of other robots' announcements are
+explicitly stated.<br>
+<br>
+<!--TOC subsubsection Robber's turns-->
+
+<h4><a name="htoc8">2.3.1</a>&nbsp;&nbsp;Robber's turns</h4><!--SEC END -->
+
+<a name="rules:robber-turns"></a>
+The Robber-Bot's turn happens between an even numbered world and an odd 
+numbered world. That means that a Robber-Bot is always given an even 
+numbered world to view. Once the robber submits its move, a number of 
+changes happen to the world to produce the next world.<br>
+<br>
+<!--TOC paragraph Evidence placement and collection-->
+
+<h5>Evidence placement and collection</h5><!--SEC END -->
+
+If this world number is one where the robber would leave evidence, as described in section&nbsp;<a href="#rules:evidence">2.1</a>, the evidence is placed before generating world <i>n</i>+1. The evidence, tho, is labelled <i>n</i>, since the robber was on the intersection where the evidence was placed in world <i>n</i>. Similarly, any evidence that documents the robber location on the board in world <i>n</i>-24 is removed from the board.<br>
+<br>
+<!--TOC paragraph Larceny stage-->
+
+<h5>Larceny stage</h5><!--SEC END -->
+
+If the Robber-Bot is standing on a bank, it empties the bank's vault
+and collects the full value of the vault's contents. In other words,
+the amount the robber is considered to have robbed is increased by the
+current amount of money in the bank, the bank is considered to have
+been robbed on turn <i>n</i> and its current money is set to zero.<br>
+<br>
+<!--TOC paragraph Bank transfer stage-->
+
+<h5>Bank transfer stage</h5><!--SEC END -->
+
+In this stage money is transferred between banks. Any bank that was
+robbed on world <i>n</i>-8 (that is, the robber was standing on the bank in world <i>n</i>-8) now has money transferred to it using the process
+described in section&nbsp;<a href="#rules:banks">2.1</a>. If a bank 
+transfer would happen at the same time as the robber robs a bank, the 
+robbery happens first and the transfer happens second.<br>
+<br>
+<!--TOC subsubsection Cop turns-->
+
+<h4><a name="htoc9">2.3.2</a>&nbsp;&nbsp;Cop turns</h4><!--SEC END -->
+
+<a name="rules:cop-turns"></a>
+The Cop-Bot's turn happens between an odd numbered world and an even 
+numbered world. That means that a Cop-Bot is always given an odd 
+numbered world to view and discuss with its fellow Cop-Bots. Once the 
+discussion is complete, Cop-Bots submit their moves and the world is 
+changed to reflect the moves (becoming an even-numbered world).<br>
+<br>
+<!--TOC paragraph World updates stage-->
+
+<h5>World updates stage</h5><!--SEC END -->
+
+At the start of this stage, each Cop-Bot is told about the world, 
+including any evidence it has collected, if it can smell the Robber-Bot 
+(and at what distance), the positions of the other Cop-Bots, and the 
+amount of money in each bank. In addition, if the Robber-Bot is standing
+ on a bank, the world shows the Robber-Bot's position.<br>
+<br>
+<!--TOC paragraph Communication stage-->
+
+<h5>Communication stage</h5><!--SEC END -->
+
+In this stage Cop-Bots can share information. Cop-Bots announce 
+information about their observations and can also make hypotheses about 
+the robber's location. The cop communication stage is over after all 
+cops have announced their observations and hypotheses.<br>
+<br>
+<!--TOC paragraph Planning stage-->
+
+<h5>Planning stage</h5><!--SEC END -->
+
+At the start of the planning stage, each Cop-Bot receives any 
+announcements sent to them during the communication stage. Each Cop-Bot 
+then formulates a plan and announces it. The planning stage is over 
+after all Cop-Bots have submitted a plan.<br>
+<br>
+<!--TOC paragraph Voting stage-->
+
+<h5>Voting stage</h5><!--SEC END -->
+
+At the start of the voting stage each cop receives a copy of all plans
+announced in the previous stage. Each Cop-Bot announces a ranking of
+the plans it received, from best to worst.<br>
+<br>
+Once the cops announce their votes, the votes are tallied. The
+algorithm used to select the winning plan is as follows:<br>
+<br>
+
+
+<ol type="1"><li><a name="item:init"></a>
+Initialize <tt>ballots</tt> to the list of all ballots where
+ each ballot is ordered by decreasing preference (most desirable
+ candidate first). Go to step&nbsp;<a href="#item:init2">2</a>.<br>
+<br>
+</li><li><a name="item:init2"></a>
+ Initialize <tt>running candidates</tt> to the set of all
+ candidates. Go to step&nbsp;<a href="#item:loop">3</a>.<br>
+<br>
+</li><li><a name="item:loop"></a> If <tt>running candidates</tt> is empty,
+ or all of the ballots are empty, 
+ voting is over without a winner. Otherwise, go to step&nbsp;<a href="#item:winner">4</a>.<br>
+<br>
+</li><li><a name="item:winner"></a>
+If <tt>running candidates</tt> is a singleton set, return its
+ only element as the winner of the election. Otherwise, go to step&nbsp;<a href="#item:count">5</a>.<br>
+<br>
+</li><li><a name="item:count"></a>
+For each candidate <tt>x</tt> in <tt>running candidates</tt>,
+ determine the number <tt>C(x)</tt> of times it appears in first
+ place on a ballot in <tt>ballots</tt>. Go to step&nbsp;<a href="#item:top">6</a>.<br>
+<br>
+</li><li><a name="item:top"></a>
+ Let <tt>top</tt> be the subset of <tt>running candidates</tt>
+ such that <tt>x</tt> is in <tt>top</tt> if and only if <tt>C(x)</tt>
+ is maximal. Go to step&nbsp;<a href="#item:cmp-top">7</a>.<br>
+<br>
+</li><li><a name="item:cmp-top"></a>
+ If <tt>top</tt> is equal to <tt>running candidates</tt>, then
+ discard the top votes on each ballot, i.e., replace each ballot
+ <tt>b</tt> in <tt>ballots</tt> with the tail of <tt>b</tt>. Go to step&nbsp;<a href="#item:set-running">8</a>.<br>
+<br>
+</li><li><a name="item:set-running"></a>
+ Set <tt>running candidates</tt> to <tt>top</tt>, i.e., keep
+ candidates in the running only if they are top-ranked. Go to step&nbsp;<a href="#item:delete">9</a>.<br>
+<br>
+</li><li><a name="item:delete"></a>
+ For each ballot <tt>b</tt> in <tt>ballots</tt>, delete from
+ <tt>b</tt> all candidates that are not in <tt>running
+ candidates</tt>. If a ballot is now empty, then discard it. Then go
+ to step&nbsp;<a href="#item:loop">3</a>.</li></ol>
+<!--TOC paragraph Cop Movement-->
+
+<h5>Cop Movement</h5><!--SEC END -->
+
+After the votes are tallied, the Cop-Bots are informed of the winning plan. Note that the winning plan is <i>not binding</i>. Cop-Bots are free to disobey it.<br>
+<br>
+Each cop then announces where to move and whether it is travelling by 
+foot or in a Robo-Cruiser. It is only legal to switch modes of 
+transportation if the Cop-Bot is on the police headquarters in the 
+current world.<br>
+<br>
+The moves are then applied to the world to produce a new world (for the robber).<br>
+<br>
+
+<!--TOC subsection Scoring-->
+
+<h3><a name="htoc10">2.4</a>&nbsp;&nbsp;Scoring</h3><!--SEC END -->
+
+<a name="rules:scoring"></a>
+Each robot is awarded points from some <em>base</em> for overall
+performance; Cop-Bots also may get some additional <em>bonus</em> points added
+to that base for individual performance. Scoring is divided into two
+cases: the case in which the Cop-Bots capture the Robber-Bot, and the
+case in which the Robber-Bot gets away.<br>
+<br>
+If the Robber-Bot is captured, the Robber-Bot receives 0 points and
+each Cop-Bot gets one fifth of the total amount of money left in banks
+as a base. If the robber escapes, the robber receives 1 point for
+each dollar stolen from the banks and the cops all receive 0 points as a
+base. In either case, cops can receive additional individual bonus points:
+<ul><li>
+The cop that finds the most evidence get a bonus of 60 points.
+</li><li>The cop whose plans are selected most often gets a bonus of 60
+ points.
+</li><li>The cop who captures the robber, if any, gets a bonus of 60
+ points.
+</li></ul>
+The same Cop-Bot can win more than one bonus, in which case the bonus
+points are cumulative. For all bonuses, if there is a tie (e.g., if
+two Cop-Bots capture the Robber-Bot simultaneously) all cops involved
+in the tie split the points evenly. For the evidence bonus, if
+multiple Cop-Bots discover a piece of evidence on the same
+intersection simultaneously, they are both considered to have
+collected that evidence.<br>
+<br>
+
+<!--TOC section The Communications Protocol-->
+
+<h2><a name="htoc11">3</a>&nbsp;&nbsp;The Communications Protocol</h2><!--SEC END -->
+
+<a name="protocol"></a>
+It is your task to create a Bot-Brain that will control the actions of
+the Cop-Bots and Robber-Bots. However, in order to maximize available
+computing power and to keep robot production costs down, you will not
+be able to control them directly. All instructions must be sent
+through a Manager, a machine that relays messages between your
+Bot-Brain to actual Cop-Bots or Robber-Bots in the field.<br>
+<br>
+The manager uses a client-server architecture. Your Bot-Brain will
+communicate only with the Manager. Communication between Bot-Brains
+and the Manager occurs over standard input and standard output.
+Specifically, when the Manager sends a message to a Bot-Brain, the
+message is written into the Bot-Brain's standard input (STDIN).
+Similarly, when a Bot-Brain wants to send a message to the Manager, it
+should print to standard output (STDOUT). Each character is sent as a
+single ASCII octet.<br>
+<br>
+<!--TOC subsection The State Machine-->
+
+<h3><a name="htoc12">3.1</a>&nbsp;&nbsp;The State Machine</h3><!--SEC END -->
+
+The rounds described in section&nbsp;<a href="#rules:turns">2.3</a> correspond to states
+of the Bot-Brains communication protocols in
+figure&nbsp;<a href="#fig:robber-states">1</a> and figure&nbsp;<a href="#fig:cop-states">2</a>. In
+these diagrams, C --&gt; S means that the message is sent from the player
+to the game manager. S --&gt; C means that the game manager sends this
+message to the player. The labels on the edges are the names of the
+messages (defined in section&nbsp;<a href="#sec:messages">3.2.2</a>), and the names in the boxes are the names of the states.
+<blockquote><div align="center"><hr size="2" width="80%"></div><br>
+<div align="center"><img src="2005-spec_files/spec001.gif"></div><br>
+<div align="center">Figure 1: Robber-Bot state machine</div><br>
+
+<a name="fig:robber-states"></a><br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div align="center"><img src="2005-spec_files/spec002.gif"></div><br>
+<div align="center">Figure 2: Cop-Bot state machine</div><br>
+
+<a name="fig:cop-states"></a>
+<div align="center"><hr size="2" width="80%"></div></blockquote>
+Robber states:
+<ul><li><font color="purple">initial</font>: The start state. The game has just started and the
+ game manager is waiting for all players to register.<br>
+<br>
+</li><li><font color="purple">waiting_for_world</font>: The player has registered and is
+ waiting for the game manager to send an overview of the world.<br>
+<br>
+</li><li><font color="purple">waiting_for_turn</font>: The player is waiting to see the next world. <br>
+<br>
+</li><li><font color="purple">moving</font>: After receiving the world update, the robber
+ sends a move in to the server. After this state, we move to the
+ <font color="purple">waiting_for_turn</font> state, and this process repeats until the
+ game is over.<br>
+<br>
+</li><li><font color="purple">game_over</font>: The game has finished.</li></ul>
+Cop states:
+<ul><li>The <font color="purple">initial</font>, <font color="purple">waiting_for_world</font>,
+ <font color="purple">waiting_for_turn</font>, and <font color="purple">game_over</font> states are just
+ like the robber's states.<br>
+<br>
+</li><li><font color="purple">inform</font>: Once the manager sends the world update, cops
+ share information about the world with other cops.<br>
+<br>
+</li><li><font color="purple">waiting_for_inform</font>: Once a cop has submitted messages
+ to the other cops, it waits until it receives the messages from the
+ others.<br>
+<br>
+</li><li><font color="purple">planning</font>: Once the cops have shared information with
+ each other, they formulate suggested plans and transmit them to the
+ server.<br>
+<br>
+</li><li><font color="purple">waiting_for_plans</font>: After your Cop-Brain has submitted
+ its plan, it waits to hear others' plans.<br>
+<br>
+</li><li><font color="purple">voting</font>: Once all of the cops submit a plan the plans are
+ sent to all of the cops, and the cops evaluate them. The cops then
+ cast a ballot indicating their preference for the plans.<br>
+<br>
+</li><li><font color="purple">waiting_for_results</font>: Your Cop-Brain has voted, and is
+ waiting for the results from the server.<br>
+<br>
+</li><li><font color="purple">moving</font>: The game manager sends the winning plan to all
+ of the cops, the cops respond with their moves, and the cycle
+ repeats (until the game is over).</li></ul>
+<!--TOC subsection Message Grammar-->
+
+<h3><a name="htoc13">3.2</a>&nbsp;&nbsp;Message Grammar</h3><!--SEC END -->
+
+The message protocol is line-based. Each line consists of a series of 
+tokens, separated by a tab or a space, and each message is a series of 
+lines. Each separator must be exactly one tab character or exactly one 
+space character and lines may not begin with spaces or tabs. Newlines 
+may be either just a single newline character (ASCII 10), or a return 
+(ASCII 13) followed by a newline.<br>
+<br>
+<!--TOC subsubsection Tokens-->
+
+<h4><a name="htoc14">3.2.1</a>&nbsp;&nbsp;Tokens</h4><!--SEC END -->
+
+This subsection describes the tokens that build up lines. Each of the
+categories below is specified with a regular expression, using square
+brackets for character ranges, <tt>+</tt> to indicate at least one
+repetition, | for alternatives, and otherwise characters are
+literals. The characters <tt>\r</tt> and <tt>\n</tt> are used for return
+(ASCII 13) and newline (ASCII 10), respectively. In addition to the
+constraints below, no token may be more than 100 characters.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">name</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><code>[-a-zA-Z0-9_#()]+</code></td>
+<td nowrap="nowrap" align="left">names include hyphen, letters, numbers</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" align="left">underscore, hash, and parens</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">number</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><tt>[0-9]+</tt></td>
+<td nowrap="nowrap" align="left">sequence of digits</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">negnumber</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><tt>-[0-9]+</tt></td>
+<td nowrap="nowrap" align="left">a negative sign followed by a sequence of digits</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">bot</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><i>name</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">loc</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><i>name</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">bank-value</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><i>number</i></td>
+<td nowrap="nowrap" align="left">must be between 0 and 1000 inclusive</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">loot</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><i>number</i></td>
+<td nowrap="nowrap" align="left">must be between 0 and 6000 inclusive</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">world</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><i>number</i></td>
+<td nowrap="nowrap" align="left">must be between 0 and 200 inclusive</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">distance</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><i>number</i></td>
+<td nowrap="nowrap" align="left">must be between 0 and the number of nodes inclusive</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">certainty</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><i>number</i> | <i>negnumber</i></td>
+<td nowrap="nowrap" align="left">must be between -100 and 100 inclusive</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">coordinate</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><i>number</i></td>
+<td nowrap="nowrap" align="left">must be betwen 0 and 1023 inclusive</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">eol</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><tt>\r\n</tt> | <tt>\n</tt></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">ptype</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td colspan="2" nowrap="nowrap" align="left"><tt>cop-foot</tt> | <tt>cop-car</tt> | <tt>robber</tt></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">edge-type</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td nowrap="nowrap" align="left"><tt>car</tt> | <tt>foot</tt></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">node-tag</td>
+<td nowrap="nowrap" align="left">:=</td>
+<td colspan="2" nowrap="nowrap" align="left"><tt>hq</tt> | <tt>bank</tt> | <tt>robber-start</tt> | <tt>ordinary</tt></td>
+</tr></tbody></table><br>
+<!--TOC subsubsection Messages-->
+
+<h4><a name="htoc15">3.2.2</a>&nbsp;&nbsp;Messages</h4><!--SEC END -->
+<a name="sec:messages"></a>
+Each of the grammars below describes the format of the messages from
+the edges in the state machines (figures&nbsp;<a href="#fig:robber-states">1</a>
+and&nbsp;<a href="#fig:cop-states">2</a>).<br>
+<br>
+Text in <tt>typewriter</tt> font is literal data. References to other
+parts of the spec are typeset in <i>italics</i>. Lines that are
+surrounded in parenthesis with a trailing asterisk (*) may appear any 
+number of times between 0 and 1000 (with the exception of the last two 
+messages in this section; see below).<br>
+<br>
+<!--TOC paragraph Register: (C --&gt; S)-->
+
+<h5>Register: (C --&gt; S)</h5><!--SEC END -->
+
+Bots use this message to register with the server.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">register-msg</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>reg:</tt> <i>bot</i> <i>ptype</i> <i>eol</i></td>
+</tr></tbody></table><!--TOC paragraph World Skeleton: (S --&gt; C)-->
+
+<h5>World Skeleton: (S --&gt; C)</h5><!--SEC END -->
+
+This message indicates initial information that the player receives.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">world-skeleton-msg</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>wsk\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>name:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>robber:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>cop:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>cop:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>cop:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>cop:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>cop:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>nod\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(&nbsp;<tt>nod:</tt> <i>loc</i> <i>node-tag</i> <i>coordinate</i> <i>coordinate</i> <i>eol</i>&nbsp;)*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>nod/</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>edg\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(&nbsp;<tt>edg:</tt> <i>loc</i> <i>loc</i> <i>edge-type</i> <i>eol</i>&nbsp;)*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>edg/</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>wsk/</tt> <i>eol</i></td>
+</tr></tbody></table>The player's name is repeated back to the player, in case the server
+changed it. The server only changes the name when it is the same as
+some other player's name. Following the player's name, the server
+reports the names of all of the players in the game.<br>
+<br>
+In a node line, the tag <tt>bank</tt> indicates that the given node is a
+bank, <tt>hq</tt> indicates that the given node is a headquarters,
+<tt>robber-start</tt> indicates that the given node is the node on which
+the robber starts the game, and <tt>ordinary</tt> indicates that the node
+is not one of those three types. There is always exactly one
+headquarters and exactly one robber start position on any
+world-skeleton message.<br>
+<br>
+The coordinates associated with the nodes indicate relative positions
+of the nodes (in the usual computer-science coordinate system: (0,0)
+is at the top left, and bigger coordinates move to the right and down,
+respectively) to show where the nodes match up (approximately) to a
+real map of Hyde Park. The coordinates do not play a role in game
+play, but may help you visualize the game.<br>
+<br>
+The <tt>edg:</tt> lines show the source edge first and the target edge second.<br>
+<br>
+<!--TOC paragraph World (S --&gt; C)-->
+
+<h5>World (S --&gt; C)</h5><!--SEC END -->
+
+This message contains all the data that is variable in the world (values
+ at banks, whether you found evidence or not, location/types of 
+players). The <tt>rbd:</tt> line contains the amount
+of loot the robber currently has. The <tt>bv</tt> section describes the
+amount of money in the banks. The <tt>ev</tt> section describes the
+evidence on the current node; it indicates the location and turn where
+the robber was (there are never any <tt>ev:</tt> lines for the robber).
+The <tt>smell:</tt> line indicates if cops can sense the robber nearby. 
+If the cops cannot sense the robber, the distance will be zero (the 
+distance is always zero for the robber). Finally, the <tt>pl</tt> section describes the visible players, their types, and their
+locations.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">world-msg</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>wor\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>wor:</tt> <i>world</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>rbd:</tt> <i>loot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>bv\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(&nbsp;<tt>bv:</tt> <i>loc</i> <i>bank-value</i> <i>eol</i>&nbsp;)*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>bv/</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>ev\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(&nbsp;<tt>ev:</tt> <i>loc</i> <i>world</i> <i>eol</i>&nbsp;)*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>ev/</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>smell:</tt> <i>distance</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>pl\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(&nbsp;<tt>pl:</tt> <i>bot</i> <i>loc</i> <i>ptype</i> <i>eol</i>&nbsp;)*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>pl/</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>wor/</tt> <i>eol</i></td>
+</tr></tbody></table><!--TOC paragraph Move (C --&gt; S)-->
+
+<h5>Move (C --&gt; S)</h5><!--SEC END -->
+
+The players communicate their moves with a <tt>mov:</tt> line. The <i>ptype</i> must match the player's current <i>ptype</i>
+ unless the player is a cop and is located at the cop headquarters in 
+the current world. In that case, a cop may switch its type from <tt>cop-car</tt> to <tt>cop-foot</tt>.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">move-msg</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>mov:</tt> <i>loc</i> <i>ptype</i> <i>eol</i></td>
+</tr></tbody></table><!--TOC paragraph Game Over (S --&gt; C)-->
+
+<h5>Game Over (S --&gt; C)</h5><!--SEC END -->
+
+This means the game has finished.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">game-over-msg</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>game-over</tt> <i>eol</i></td>
+</tr></tbody></table><!--TOC paragraph Inform (C --&gt; S)-->
+
+<h5>Inform (C --&gt; S)</h5><!--SEC END -->
+
+Cop-Brains share information about player locations with this message.
+Each line indicates where and when a player was (or is or will be),
+with a certainty. Positive certainties indicate how sure the reporter
+is that the information is true. Negative certainties should be
+interpreted as how certain the reporter is that the information is
+false.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">inform-msg</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>inf\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(&nbsp;<tt>inf:</tt> <i>bot</i> <i>loc</i> <i>ptype</i> <i>world</i> <i>certainty</i> <i>eol</i>&nbsp;)*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>inf/</tt> <i>eol</i></td>
+</tr></tbody></table><!--TOC paragraph Suggest Plan (C --&gt; S)-->
+
+<h5>Suggest Plan (C --&gt; S)</h5><!--SEC END -->
+
+The plan message communicates suggested moves for each Cop-Bot. A
+plan may contain any number of moves for any robot.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">plan-msg</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>plan\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(&nbsp;<tt>plan:</tt> <i>bot</i> <i>loc</i> <i>ptype</i> <i>world</i> <i>eol</i>&nbsp;)*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>plan/</tt> <i>eol</i></td>
+</tr></tbody></table><!--TOC paragraph Voting (C --&gt; S)-->
+
+<h5>Voting (C --&gt; S)</h5><!--SEC END -->
+
+After each player has submitted a plan, they are sent to the cops
+using a from-msg. The voting is done by ranking, so listing a
+player's name first means that you think they have submitted the best
+plan and listing a player last means you think they submitted the
+worst plan. A legal ballot must contain each Cop-Bot's name, exactly once.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">vote-msg</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>vote\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(&nbsp;<tt>vote:</tt> <i>bot</i> <i>eol</i>&nbsp;)*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>vote/</tt> <i>eol</i></td>
+</tr></tbody></table><!--TOC paragraph Vote Tally (S --&gt; C)-->
+
+<h5>Vote Tally (S --&gt; C)</h5><!--SEC END -->
+
+After all players have voted, the server computes which is the elected
+plan and reports the winner, if any.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">vote-res-msg</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>winner:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">|</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>nowinner:</tt> <i>eol</i></td>
+</tr></tbody></table><!--TOC paragraph From: Messages from other cops (S --&gt; C)-->
+
+<h5>From: Messages from other cops (S --&gt; C)</h5><!--SEC END -->
+
+When a player sends an inform-msg or a plan-msg to the server, the server
+makes sure it is grammatically correct, and then forwards it to the
+other clients.<br>
+<br>
+These message are unlike other messages since they contain repeated
+elements that are longer than a single line. Each of the repeated
+messages is prefixed by a <tt>from:</tt> token, indicating who originally
+sent the message, and then the message they sent (with the spaces and newlines normalized).<br>
+<br>
+Unlike the other repeated elements in the protocol spec, the repeated 
+elements below may contain more than 1000 lines, but each repeated 
+element from the <i>inform-msg</i> or <i>plan-msg</i> non-terminals can 
+only appear at most 1000 times. 
+Overall, this means that entire message may be as long as 5000 lines 
+roughly (plus a few more structuring lines), since the server only sends
+ out one encapsulated message per Cop-Bot.<br>
+<table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">from-msg-inform</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>from\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>from:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><i>inform-msg</i> &nbsp; )*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>from/</tt> <i>eol</i></td>
+</tr></tbody></table><table cellpadding="0" cellspacing="2">
+<tbody><tr><td nowrap="nowrap" align="left">from-msg-plan</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">:=</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>from\</tt> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">(</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>from:</tt> <i>bot</i> <i>eol</i></td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><i>plan-msg</i> &nbsp; )*</td>
+</tr>
+<tr><td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="center">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left">&nbsp;</td>
+<td nowrap="nowrap" valign="top" align="center">&nbsp;&nbsp;</td>
+<td nowrap="nowrap" align="left"><tt>from/</tt> <i>eol</i></td>
+</tr></tbody></table><!--TOC subsection Time limits and protocol violations-->
+
+<h3><a name="htoc16">3.3</a>&nbsp;&nbsp;Time limits and protocol violations</h3><!--SEC END -->
+
+<a name="protocol:violations"></a>
+Whenever a player is required to submit information to the server, that
+player has 5 seconds to submit it from the time the server begins 
+sending the most recent communication. For example, after the server 
+starts sending the first byte of a world-update message, a Cop-Bot has 5
+ seconds to finish sending an inform message.<br>
+<br>
+The penalty for not submitting a message within the time limit or for
+submitting a malformed or illegal message is disqualification from the
+tournament; see section&nbsp;<a href="#tournament">4</a>.<br>
+<br>
+
+<!--TOC section Tournament Structure-->
+
+<h2><a name="htoc17">4</a>&nbsp;&nbsp;Tournament Structure</h2><!--SEC END -->
+
+<a name="tournament"></a>
+Your Cop-Bot and Robber-Bot progress through the tournament
+together. The tournament takes place in two rounds: a regular
+season followed by the playoffs. <br>
+<br>
+In the tournament, contestants will be grouped into pods. Each pod will 
+have six pairs of Cop-Bot and Robber-Bots. The pod plays six games and 
+in each game
+five contestant's Cop-Bots play against the sixth's contestant's 
+Robber-Bot. Each game uses a different contestant's Robber-Bot program 
+will be used Each game is scored according to the rules explained in 
+section&nbsp;<a href="#rules:scoring">2.4</a> and the score for each contestant in the pod is the sum of the scores of the games.<br>
+<br>
+In the regular season pods, each contestant's Cop-Bot will play with
+five sets of the Judges' entries. The Judges' entries will consists of
+a mediocre Cop-Bot and a mediocre Robber-Bot. They Cop-Bots will be
+slightly special, because they will act like McGruffs when your entry
+is playing a Cop. For the purposes of the regular season, if a McGruff
+is fed back information and makes an illegal move, it will stand still. When your entry is
+playing the robber, cops will be the Judges' own mediocre Cop-Bot. The
+scores are summed as usual. Any submission that does not win the pod
+during the regular season is eliminated.<br>
+<br>
+The playoffs will be a pod-based single-elimination tournament.
+The three contestants with the top three scores in each pod proceed to 
+the next round. When only six contestants remain, they will form a final
+ pod. The top
+three contestants in that pod are the first, second, and third place
+winners of the tournament. Ties are broken based on performance in
+prior rounds of the tournament. Ties in the first round will be broken 
+by performance in the regular season. Ties beyond that are unlikely (but
+ if they happen, we will find a fair way to break them).<br>
+<br>
+All programs will be run on a AMD Athlon 2700+ computer with 512MB
+RAM. They will run as users that have no network access, read-only
+access to the directory in which their program resides, read-only
+access to standard Unix paths, and a 100 megabyte quota in
+<tt>/tmp</tt>. All files in <tt>/tmp</tt> will be deleted between
+games. During each game, each cop and robber program will run on its
+own machine. The machines running non-LiveCD-based submissions will
+have slightly different specifications, but will achieve the same
+effect: no permanent, cross-game storage and no network access.<br>
+<br>
+Any contestant whose Cop-Bot or Robber-Bot is disqualified in any game (e.g., by sending an illegal message; see section&nbsp;<a href="#protocol:violations">3.3</a>)
+ is disqualified from the tournament. The particular pod where a 
+disqualification occurs is with a new sixth member. (The aborted pod's 
+partial results are ignored). Otherwise, the contestant's score for the 
+pod is the sum of its scores for each game in the pod.<br>
+<br>
+In the event that the contestants cannot be grouped into groups of six 
+evenly, an unspecified process takes place to form groups of six. No 
+games ever take place in which there are not five cop programs competing
+ against one robber program.<br>
+<br>
+
+<!--TOC section Version History-->
+
+<h2><a name="htoc18">5</a>&nbsp;&nbsp;Version History</h2><!--SEC END -->
+
+
+
+
+<b>Version 7.</b> Improved timeout description in section 3.3. <br>
+<br>
+<b>Version 6.</b> Fixed bug in description of Bank transfers in 2.1 (transfer timing in 2.3.1 is correct). Fixed typo in first para of 3.2. <br>
+<br>
+<b>Version 5.</b> Added <tt>edg:</tt> directionality explanation. Improved description of tournament structure. <br>
+<br>
+<b>Version 4.</b> Fixed bug in voting algorithm spec. Improved smell description. <br>
+<br>
+<b>Version 3.</b> Whitespace conventions clarified in 3.2. <br>
+<br>
+<b>Version 2.</b> Typo fixed in 2.3.2. <br>
+<br>
+<b>Version 1.</b> Initial release. 
+<br>
+<br>
+<!--HTMLFOOT-->
+<!--ENDHTML-->
+<!--FOOTER-->
+<hr size="2">
+<blockquote><em>This document was translated from L<sup>A</sup>T<sub>E</sub>X by
+</em><a href="http://pauillac.inria.fr/%7Emaranget/hevea/index.html"><em>H<font size="2"><sup>E</sup></font>V<font size="2"><sup>E</sup></font>A</em></a><em>.
+</em></blockquote>
+
+
+</body></html>
