@@ -8,7 +8,7 @@ def readOpponentTurn():
     opp2 = raw_input()
     opp3 = raw_input()
 
-def double(slot):
+def dbl(slot):
     print "1"
     print "dbl"
     print slot
