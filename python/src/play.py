@@ -29,6 +29,16 @@ def dec(slot):
     print "dec"
     print slot
 
+def simpleAttack(slot):
+    zero(slot)
+    succ(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dec(slot)
+
 if(playerNum == 1):
     readOpponentTurn()
 
@@ -37,15 +47,7 @@ realTurn = 0
 while(1 == 1):
     turnNum = turnNum + 1
     realTurn = realTurn + 1
-    if(turnNum == 0):
-        zero(0)
-    elif(turnNum == 1):
-        succ(0)
-    elif(turnNum == 2):
-        dbl(0)
-    elif(turnNum == 3):
-        dec(0)
-        turnNum = 0
+    simpleAttack(0)
 
     if(realTurn >= 100000):
         sys.exit(0)
