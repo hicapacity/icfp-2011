@@ -1,2 +1,3 @@
 #!/bin/sh
-python src/play.py $@
+DIRECTORY=$(cd `dirname $0` && pwd)
+python ${DIRECTORY}/src/play.py $@
