@@ -35,11 +35,11 @@ turnNum = 0
 while(1 == 1):
     turnNum = turnNum + 1
     if(turnNum == 0):
-        zero()
+        zero(0)
     elif(turnNum == 1):
-        succ()
+        succ(0)
     elif(turnNum <= 6):
-        dbl()
+        dbl(0)
     elif(turnNum >= 7):
-        dec()
+        dec(0)
         turnNum = 0
