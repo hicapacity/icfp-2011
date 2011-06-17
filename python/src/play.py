@@ -16,7 +16,7 @@ def dbl(slot):
 def zero(slot):
     print "2"
     print slot
-    print zero
+    print "zero"
 
 def succ(slot):
     print "1"
