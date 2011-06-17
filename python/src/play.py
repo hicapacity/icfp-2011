@@ -18,7 +18,7 @@ def zero(slot):
     print slot
     print zero
 
-def succ(slot);
+def succ(slot):
     print "1"
     print "succ"
     print slot
