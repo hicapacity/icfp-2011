@@ -33,8 +33,10 @@ if(playerNum == 1):
     readOpponentTurn()
 
 turnNum = 0
+realTurn = 0
 while(1 == 1):
     turnNum = turnNum + 1
+    realTurn = realTurn + 1
     if(turnNum == 0):
         zero(0)
     elif(turnNum == 1):
@@ -44,3 +46,6 @@ while(1 == 1):
     elif(turnNum == 3):
         dec(0)
         turnNum = 0
+
+    if(realTurn >= 100000):
+        sys.exit(0)
