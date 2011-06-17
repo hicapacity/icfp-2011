@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 playerNum = sys.argv[1]
-print "I am player %s" % playerNum
+#print "I am player %s" % playerNum
 
 def readOpponentTurn():
     opp1 = raw_input()
@@ -14,6 +14,7 @@ def dbl(slot):
     print slot
 
 def zero(slot):
+    #print >> sys.stderr, "zero!"
     print "2"
     print slot
     print "zero"
@@ -38,8 +39,8 @@ while(1 == 1):
         zero(0)
     elif(turnNum == 1):
         succ(0)
-    elif(turnNum <= 6):
+    elif(turnNum == 2):
         dbl(0)
-    elif(turnNum >= 7):
+    elif(turnNum == 3):
         dec(0)
         turnNum = 0
