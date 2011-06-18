@@ -49,5 +49,5 @@ while(1 == 1):
     realTurn = realTurn + 1
     simpleAttack(0)
 
-    if(realTurn >= 100000):
+    if(realTurn >= 10000000):
         sys.exit(0)
