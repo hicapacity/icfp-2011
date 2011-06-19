@@ -50,3 +50,50 @@ def simpleAttack(slot):
     dbl(slot)
     dec(slot)
 
+def large(slot):
+    zero(slot)
+    succ(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+    dbl(slot)
+
+def s2(slot):
+    print "2"
+    print slot
+    print "S"
+
+def s1(slot):
+    print "1"
+    print "S"
+    print slot
+
+def i1(slot):
+    print "1"
+    print "I"
+    print slot
+
+def i2(slot):
+    print "2"
+    print slot
+    print "I"
+
+def k1(slot):
+    print "1"
+    print "K"
+    print slot
+
+def k2(slot):
+    print "2"
+    print slot
+    print "K"
